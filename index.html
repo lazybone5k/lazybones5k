@@ -134,6 +134,33 @@ details.nerd[open] .nerd-toggle{background:var(--volt);color:var(--ink)}
 .pending{border:1px dashed var(--dim);border-radius:12px;padding:16px;color:var(--muted);font-size:.95rem}
 .zone-legend i{border-radius:3px}
 .garmin td,.garmin th{font-size:1rem;padding:8px 10px}
+/* Kalender */
+.cal-sum{display:flex;flex-wrap:wrap;gap:8px 20px;color:var(--muted);margin:0 0 14px}
+.cal-sum b{color:var(--fg);font-family:var(--f-num);font-size:1.15rem}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.cal .dow{font-family:var(--f-num);font-weight:600;text-transform:uppercase;letter-spacing:.06em;font-size:.8rem;color:var(--muted);text-align:center;padding-bottom:4px}
+.cal .day{min-height:74px;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:4px 5px;display:flex;flex-direction:column;gap:3px;min-width:0}
+.cal .day.out{opacity:.35}
+.cal .day.today{border-color:var(--volt);box-shadow:inset 0 0 0 1px var(--volt)}
+.cal .dn{font-family:var(--f-num);font-size:.85rem;color:var(--muted)}
+.cal .ev{font-family:var(--f-num);font-weight:700;font-size:.82rem;line-height:1.1;border-radius:5px;padding:2px 5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border:1.5px solid transparent;text-align:left;cursor:default;background:none;color:inherit}
+.ev.run{background:var(--pink);color:#fff;cursor:pointer}
+.ev.part{background:repeating-linear-gradient(135deg,var(--pink) 0 6px,#c4126b 6px 12px);color:#fff;cursor:pointer}
+.ev.plan{border-color:var(--dim);color:var(--muted)}
+.ev.next{border-color:var(--volt);color:var(--volt)}
+.ev.moved{border-style:dashed;border-color:var(--dim);color:var(--dim)}
+.ev.str{background:var(--z2);color:#06121f}
+.cal-legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:10px;color:var(--muted);font-size:.88rem}
+.cal-legend .ev{display:inline-block;cursor:default;width:22px;height:13px;padding:0;vertical-align:-2px}
+.strength{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:16px;margin-top:16px}
+.scard{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px;min-width:0}
+.scard .shead{display:flex;justify-content:space-between;gap:8px;align-items:baseline;flex-wrap:wrap}
+.scard .d{font-family:var(--f-num);font-weight:700;color:var(--z2);text-transform:uppercase;letter-spacing:.06em}
+.scard .m{font-family:var(--f-num);color:var(--muted)}
+.scard h4{margin:4px 0 8px;font-size:1.1rem}
+.tags{display:flex;flex-wrap:wrap;gap:5px}
+.tags span{font-size:.82rem;border:1px solid var(--line);border-radius:999px;padding:2px 9px;color:var(--muted)}
+@media (max-width:560px){.cal .day{min-height:58px;padding:3px}.cal .ev{font-size:.72rem;padding:1px 3px}.cal .dn{font-size:.75rem}}
 .tip{position:fixed;z-index:20;pointer-events:none;background:var(--panel-2);border:1px solid var(--dim);color:var(--fg);padding:6px 10px;border-radius:8px;font-family:var(--f-num);font-size:.95rem;white-space:pre;box-shadow:0 6px 20px rgba(0,0,0,.4)}
 
 @media (max-width:720px){
@@ -158,6 +185,7 @@ details.nerd[open] .nerd-toggle{background:var(--volt);color:var(--ink)}
     </a>
     <nav class="nav" aria-label="Menu">
       <a href="#reisen" data-i18n="nav_journey">The journey</a>
+      <a href="#kalender" data-i18n="nav_cal">Calendar</a>
       <a href="#okta" data-i18n="nav_run">Latest run</a>
       <a href="#loggen" data-i18n="nav_log">Log</a>
       <a href="#vlogg" data-i18n="nav_vlog">Vlog</a>
@@ -194,6 +222,7 @@ details.nerd[open] .nerd-toggle{background:var(--volt);color:var(--ink)}
           <p class="eyebrow" data-i18n="j_eyebrow">The journey so far</p>
           <h2 data-i18n="j_title">8 weeks. 24 runs. 5K.</h2>
           <p class="lead" data-i18n="j_lead">The program is Couch to 5K: three runs a week, with the running intervals getting a little longer each week. Each bar is one run, and its height shows the total minutes of running.</p>
+          <p class="lead" id="rw-src"></p>
         </div>
       </div>
       <div class="stats">
@@ -208,6 +237,25 @@ details.nerd[open] .nerd-toggle{background:var(--volt);color:var(--ink)}
         <div id="c-plan"></div>
         <div class="legend"><span><i style="background:var(--pink)"></i><span data-i18n="lg_done">Completed</span></span><span><i style="background:transparent;border:2px solid var(--volt)"></i><span data-i18n="lg_next">Next</span></span><span><i style="background:var(--line)"></i><span data-i18n="lg_later">Coming up</span></span></div>
       </div>
+    </div>
+  </section>
+
+  <section id="kalender">
+    <div class="wrap">
+      <div class="head">
+        <div>
+          <p class="eyebrow" data-i18n="k_eyebrow">Plan vs. reality</p>
+          <h2 data-i18n="k_title">The training calendar</h2>
+          <p class="lead" data-i18n="k_lead">Planned runs next to the ones I actually did. Life happens, so runs sometimes move a day or two. Tap a completed run to see the details.</p>
+        </div>
+      </div>
+      <div class="cal-sum" id="cal-sum"></div>
+      <div class="tablewrap" style="border:0;overflow:visible"><div class="cal" id="cal" role="grid"></div></div>
+      <div class="cal-legend" id="cal-legend"></div>
+
+      <h3 class="block" style="font-size:1.6rem;margin-top:36px" data-i18n="s_title">Strength and injury prevention</h3>
+      <p class="lead" data-i18n="s_lead">Going from zero to running puts a lot of new load on muscles, tendons and joints. Strength and mobility sessions for hips, glutes and core help the body handle it, so I can keep running week after week instead of ending up on the sidelines.</p>
+      <div class="strength" id="strength"></div>
     </div>
   </section>
 
@@ -243,6 +291,18 @@ details.nerd[open] .nerd-toggle{background:var(--volt);color:var(--ink)}
           <h3 data-i18n="c_cad">Cadence</h3>
           <p class="sub" data-i18n="c_cad_sub">Steps per minute in each interval.</p>
           <div id="c-kadens"></div>
+        </div>
+        <div class="panel">
+          <h3 data-i18n="c_pow">Power per interval</h3>
+          <p class="sub" data-i18n="c_pow_sub">Average running power in watts, measured by the watch. The small line shows the highest 3-second average in each interval.</p>
+          <div id="c-watt"></div>
+          <div class="legend"><span><i style="background:var(--pink)"></i><span data-i18n="lg_wavg">Average</span></span><span><i style="background:var(--volt);height:3px"></i><span data-i18n="lg_wmax">Max</span></span></div>
+        </div>
+        <div class="panel">
+          <h3 data-i18n="c_resp">Breathing</h3>
+          <p class="sub" data-i18n="c_resp_sub">Breaths per minute, estimated from the heart rate strap. Running vs. the walk break after.</p>
+          <div id="c-resp"></div>
+          <div class="legend"><span><i style="background:var(--pink)"></i><span data-i18n="lg_rrun">Running</span></span><span><i style="background:var(--volt)"></i><span data-i18n="lg_rwalk">Walk break</span></span></div>
         </div>
       </div>
     </div>
@@ -299,6 +359,21 @@ details.nerd[open] .nerd-toggle{background:var(--volt);color:var(--ink)}
               <div><h3 style="font-size:1.05rem" data-i18n="n_gct">Ground contact time</h3><p class="sub" data-i18n="n_gct_sub">Milliseconds per step. Lower is usually more efficient.</p><div id="c-gct"></div></div>
               <div><h3 style="font-size:1.05rem" data-i18n="n_vo">Vertical oscillation</h3><p class="sub" data-i18n="n_vo_sub">How much I bounce up and down, in cm.</p><div id="c-vo"></div></div>
               <div><h3 style="font-size:1.05rem" data-i18n="n_vr">Vertical ratio</h3><p class="sub" data-i18n="n_vr_sub">Bounce divided by stride length. Lower means less energy goes upwards.</p><div id="c-vr"></div></div>
+            </div>
+          </div>
+
+          <div class="grid2">
+            <div class="panel">
+              <h3 data-i18n="n_powt">Running power</h3>
+              <p class="sub" data-i18n="n_powt_sub">Average and highest power in the running intervals, run by run.</p>
+              <div id="c-powt"></div>
+              <div class="legend"><span><i style="background:var(--pink)"></i><span data-i18n="lg_wavg">Average</span></span><span><i style="background:var(--volt)"></i><span data-i18n="lg_wmax">Max</span></span></div>
+            </div>
+            <div class="panel">
+              <h3 data-i18n="n_respt">Breathing rate</h3>
+              <p class="sub" data-i18n="n_respt_sub">Average breaths per minute while running and walking, plus the highest value in the run.</p>
+              <div id="c-respt"></div>
+              <div class="legend"><span><i style="background:var(--pink)"></i><span data-i18n="lg_rrun">Running</span></span><span><i style="background:var(--volt)"></i><span data-i18n="lg_rwalk">Walk break</span></span><span><i style="background:var(--muted)"></i><span data-i18n="lg_rmax">Max</span></span></div>
             </div>
           </div>
 
@@ -433,7 +508,7 @@ details.nerd[open] .nerd-toggle{background:var(--volt);color:var(--ink)}
 
 <div class="tip" id="tip" hidden></div>
 
-<script type="application/json" id="site-data">{"oppdatert_uke":2,"okter":[{"id":"u0o0","label":"Startpunkt","uke":0,"okt":0,"lop_min":1.0,"gange_min":1.5,"antall_drag":8,"lopte_min":8.0,"km":2.39,"stigning":4.0,"tempo_s":359,"puls":152,"pause_puls":134.4,"pulsfall":30.2,"kadens":165,"steg_m":0.96,"gct_ms":274,"vo_cm":8.0,"vr_pct":8.36,"puls_drift":3.0,"tempo_drift":25.7,"ef":1.1,"steg_est":1318,"nerd":{},"drag":[{"n":1,"tempo_s":353,"puls":151,"pause_puls":131,"hoyde":-8.2,"kadens":163,"steg_m":0.99,"gct_ms":274,"vo_cm":8.18,"vr_pct":8.27},{"n":2,"tempo_s":331,"puls":166,"pause_puls":132,"hoyde":-2.0,"kadens":171,"steg_m":1.06,"gct_ms":265,"vo_cm":8.4,"vr_pct":8.06},{"n":3,"tempo_s":348,"puls":165,"pause_puls":134,"hoyde":-0.2,"kadens":168,"steg_m":1.04,"gct_ms":266,"vo_cm":8.25,"vr_pct":7.9},{"n":4,"tempo_s":358,"puls":167,"pause_puls":135,"hoyde":0.6,"kadens":165,"steg_m":0.98,"gct_ms":272,"vo_cm":8.1,"vr_pct":8.23},{"n":5,"tempo_s":380,"puls":169,"pause_puls":132,"hoyde":1.4,"kadens":162,"steg_m":0.95,"gct_ms":279,"vo_cm":8.02,"vr_pct":8.46},{"n":6,"tempo_s":359,"puls":162,"pause_puls":135,"hoyde":-2.8,"kadens":164,"steg_m":0.96,"gct_ms":275,"vo_cm":8.03,"vr_pct":8.39},{"n":7,"tempo_s":390,"puls":161,"pause_puls":138,"hoyde":-1.4,"kadens":155,"steg_m":0.84,"gct_ms":289,"vo_cm":7.42,"vr_pct":8.81},{"n":8,"tempo_s":360,"puls":168,"pause_puls":138,"hoyde":2.0,"kadens":170,"steg_m":0.88,"gct_ms":275,"vo_cm":7.67,"vr_pct":8.74}]},{"id":"u1o1","label":"Uke 1 økt 1","uke":1,"okt":1,"lop_min":1.0,"gange_min":1.5,"antall_drag":8,"lopte_min":8.0,"km":2.46,"stigning":7.4,"tempo_s":356,"puls":154,"pause_puls":141.8,"pulsfall":28.5,"kadens":164,"steg_m":0.96,"gct_ms":279,"vo_cm":8.09,"vr_pct":8.51,"puls_drift":7.3,"tempo_drift":0.3,"ef":1.094,"steg_est":1316,"nerd":{"soner_s":[0,39,511,625,25],"watt":405,"te_aerob":3.6,"te_anaerob":1.3,"vo2max":39.0,"hjerteslag":5199,"steg":4022,"km_total":3.82},"drag":[{"n":1,"tempo_s":343,"puls":154,"pause_puls":132,"hoyde":-0.8,"kadens":164,"steg_m":0.95,"gct_ms":277,"vo_cm":8.03,"vr_pct":8.47},{"n":2,"tempo_s":358,"puls":164,"pause_puls":134,"hoyde":2.2,"kadens":170,"steg_m":0.93,"gct_ms":278,"vo_cm":7.97,"vr_pct":8.67},{"n":3,"tempo_s":354,"puls":171,"pause_puls":141,"hoyde":-0.6,"kadens":166,"steg_m":1.0,"gct_ms":272,"vo_cm":8.18,"vr_pct":8.23},{"n":4,"tempo_s":369,"puls":167,"pause_puls":146,"hoyde":1.4,"kadens":159,"steg_m":0.95,"gct_ms":282,"vo_cm":8.07,"vr_pct":8.48},{"n":5,"tempo_s":370,"puls":172,"pause_puls":143,"hoyde":-0.6,"kadens":160,"steg_m":0.9,"gct_ms":285,"vo_cm":7.86,"vr_pct":8.79},{"n":6,"tempo_s":355,"puls":170,"pause_puls":147,"hoyde":-0.8,"kadens":170,"steg_m":1.03,"gct_ms":273,"vo_cm":8.3,"vr_pct":8.21},{"n":7,"tempo_s":350,"puls":171,"pause_puls":141,"hoyde":3.4,"kadens":166,"steg_m":1.0,"gct_ms":277,"vo_cm":8.39,"vr_pct":8.41},{"n":8,"tempo_s":351,"puls":170,"pause_puls":150,"hoyde":0.4,"kadens":161,"steg_m":0.91,"gct_ms":285,"vo_cm":7.95,"vr_pct":8.8}]},{"id":"u1o2","label":"Uke 1 økt 2","uke":1,"okt":2,"lop_min":1.0,"gange_min":1.5,"antall_drag":8,"lopte_min":8.0,"km":2.39,"stigning":0,"tempo_s":364,"puls":155,"pause_puls":143.2,"pulsfall":26.1,"kadens":161,"steg_m":0.94,"gct_ms":283,"vo_cm":8.0,"vr_pct":8.54,"puls_drift":3.3,"tempo_drift":44.0,"ef":1.063,"steg_est":1283,"nerd":{"soner_s":[0,7,564,578,51],"watt":381,"te_aerob":3.4,"te_anaerob":2.0,"vo2max":39.3,"hjerteslag":4817,"steg":3728,"km_total":3.61},"drag":[{"n":1,"tempo_s":343,"puls":163,"pause_puls":145,"hoyde":-2.0,"kadens":161,"steg_m":1.02,"gct_ms":283,"vo_cm":8.35,"vr_pct":8.21},{"n":2,"tempo_s":331,"puls":167,"pause_puls":141,"hoyde":-7.6,"kadens":162,"steg_m":0.96,"gct_ms":277,"vo_cm":7.98,"vr_pct":8.29},{"n":3,"tempo_s":368,"puls":165,"pause_puls":143,"hoyde":-2.0,"kadens":162,"steg_m":0.95,"gct_ms":283,"vo_cm":8.19,"vr_pct":8.6},{"n":4,"tempo_s":434,"puls":159,"pause_puls":136,"hoyde":-1.8,"kadens":154,"steg_m":0.93,"gct_ms":287,"vo_cm":7.84,"vr_pct":8.44},{"n":5,"tempo_s":299,"puls":180,"pause_puls":147,"hoyde":-1.6,"kadens":171,"steg_m":1.03,"gct_ms":264,"vo_cm":8.16,"vr_pct":7.98},{"n":6,"tempo_s":393,"puls":169,"pause_puls":145,"hoyde":-1.4,"kadens":157,"steg_m":0.88,"gct_ms":290,"vo_cm":7.79,"vr_pct":8.87},{"n":7,"tempo_s":383,"puls":168,"pause_puls":144,"hoyde":-1.4,"kadens":159,"steg_m":0.88,"gct_ms":290,"vo_cm":7.89,"vr_pct":8.94},{"n":8,"tempo_s":398,"puls":168,"pause_puls":145,"hoyde":-0.4,"kadens":157,"steg_m":0.88,"gct_ms":291,"vo_cm":7.81,"vr_pct":8.94}]},{"id":"u1o3","label":"Uke 1 økt 3","uke":1,"okt":3,"lop_min":1.0,"gange_min":1.5,"antall_drag":6,"lopte_min":6.0,"km":1.88,"stigning":5.4,"tempo_s":350,"puls":150,"pause_puls":143.5,"pulsfall":23.8,"kadens":161,"steg_m":0.96,"gct_ms":279,"vo_cm":8.01,"vr_pct":8.37,"puls_drift":-3.0,"tempo_drift":0.0,"ef":1.143,"steg_est":966,"nerd":{"soner_s":[0,1,592,418,22],"watt":390,"te_aerob":3.2,"te_anaerob":0.5,"vo2max":39.5,"hjerteslag":4635,"steg":3685,"km_total":3.44},"drag":[{"n":1,"tempo_s":379,"puls":164,"pause_puls":145,"hoyde":2.4,"kadens":160,"steg_m":0.92,"gct_ms":285,"vo_cm":7.93,"vr_pct":8.62},{"n":2,"tempo_s":326,"puls":175,"pause_puls":143,"hoyde":2.6,"kadens":164,"steg_m":0.99,"gct_ms":272,"vo_cm":8.04,"vr_pct":8.1},{"n":3,"tempo_s":348,"puls":152,"pause_puls":140,"hoyde":-3.8,"kadens":161,"steg_m":0.97,"gct_ms":281,"vo_cm":8.14,"vr_pct":8.41},{"n":4,"tempo_s":333,"puls":166,"pause_puls":149,"hoyde":0.4,"kadens":163,"steg_m":0.98,"gct_ms":272,"vo_cm":8.01,"vr_pct":8.19},{"n":5,"tempo_s":347,"puls":159,"pause_puls":147,"hoyde":-0.6,"kadens":162,"steg_m":0.94,"gct_ms":282,"vo_cm":8.04,"vr_pct":8.61},{"n":6,"tempo_s":373,"puls":157,"pause_puls":137,"hoyde":-0.8,"kadens":156,"steg_m":0.95,"gct_ms":282,"vo_cm":7.89,"vr_pct":8.31}]},{"id":"u2o1","label":"Uke 2 økt 1","uke":2,"okt":1,"lop_min":1.0,"gange_min":1.5,"antall_drag":8,"lopte_min":8.0,"km":2.37,"stigning":8.0,"tempo_s":375,"puls":147,"pause_puls":132.1,"pulsfall":29.1,"kadens":161,"steg_m":0.95,"gct_ms":284,"vo_cm":8.07,"vr_pct":8.66,"puls_drift":-1,"tempo_drift":83.3,"ef":1.088,"steg_est":1287,"nerd":{"soner_s":[11,159,742,288,0],"watt":402,"te_aerob":3.1,"te_anaerob":2.1,"vo2max":39.8,"hjerteslag":5069,"steg":3330,"km_total":3.21},"drag":[{"n":1,"tempo_s":337,"puls":155,"pause_puls":126,"hoyde":2.0,"kadens":170,"steg_m":1.13,"gct_ms":262,"vo_cm":8.69,"vr_pct":7.68},{"n":2,"tempo_s":325,"puls":161,"pause_puls":135,"hoyde":1.0,"kadens":161,"steg_m":1.04,"gct_ms":270,"vo_cm":8.19,"vr_pct":7.9},{"n":3,"tempo_s":370,"puls":158,"pause_puls":130,"hoyde":0.4,"kadens":163,"steg_m":0.94,"gct_ms":284,"vo_cm":8.11,"vr_pct":8.72},{"n":4,"tempo_s":348,"puls":164,"pause_puls":133,"hoyde":0.2,"kadens":162,"steg_m":0.96,"gct_ms":278,"vo_cm":8.07,"vr_pct":8.39},{"n":5,"tempo_s":373,"puls":166,"pause_puls":134,"hoyde":1.2,"kadens":160,"steg_m":1.03,"gct_ms":277,"vo_cm":8.24,"vr_pct":8.28},{"n":6,"tempo_s":428,"puls":156,"pause_puls":137,"hoyde":0.8,"kadens":160,"steg_m":0.85,"gct_ms":296,"vo_cm":7.88,"vr_pct":9.34},{"n":7,"tempo_s":430,"puls":160,"pause_puls":131,"hoyde":1.2,"kadens":154,"steg_m":0.84,"gct_ms":301,"vo_cm":7.75,"vr_pct":9.24},{"n":8,"tempo_s":424,"puls":155,"pause_puls":131,"hoyde":1.2,"kadens":157,"steg_m":0.8,"gct_ms":301,"vo_cm":7.68,"vr_pct":9.62}]}],"plan":[{"uke":1,"okt":1,"label":"Uke 1 økt 1","lop_min":1.0,"gange_min":1.5,"runder":8,"ekstra_jogg_min":0.0,"beskrivelse":"8 × (1 min løp + 1,5 min gange)"},{"uke":1,"okt":2,"label":"Uke 1 økt 2","lop_min":1.0,"gange_min":1.5,"runder":8,"ekstra_jogg_min":0.0,"beskrivelse":"8 × (1 min løp + 1,5 min gange)"},{"uke":1,"okt":3,"label":"Uke 1 økt 3","lop_min":1.0,"gange_min":1.5,"runder":8,"ekstra_jogg_min":0.0,"beskrivelse":"8 × (1 min løp + 1,5 min gange)"},{"uke":2,"okt":1,"label":"Uke 2 økt 1","lop_min":1.0,"gange_min":1.5,"runder":8,"ekstra_jogg_min":0.0,"beskrivelse":"8 × (1 min løp + 1,5 min gange)"},{"uke":2,"okt":2,"label":"Uke 2 økt 2","lop_min":1.0,"gange_min":1.5,"runder":8,"ekstra_jogg_min":0.0,"beskrivelse":"8 × (1 min løp + 1,5 min gange)"},{"uke":2,"okt":3,"label":"Uke 2 økt 3","lop_min":1.0,"gange_min":1.5,"runder":8,"ekstra_jogg_min":0.0,"beskrivelse":"8 × (1 min løp + 1,5 min gange)"},{"uke":3,"okt":1,"label":"Uke 3 økt 1","lop_min":2.0,"gange_min":1.0,"runder":6,"ekstra_jogg_min":0.0,"beskrivelse":"6 × (2 min løp + 1 min gange)"},{"uke":3,"okt":2,"label":"Uke 3 økt 2","lop_min":2.0,"gange_min":1.0,"runder":6,"ekstra_jogg_min":0.0,"beskrivelse":"6 × (2 min løp + 1 min gange)"},{"uke":3,"okt":3,"label":"Uke 3 økt 3","lop_min":2.0,"gange_min":1.0,"runder":6,"ekstra_jogg_min":0.0,"beskrivelse":"6 × (2 min løp + 1 min gange)"},{"uke":4,"okt":1,"label":"Uke 4 økt 1","lop_min":4.0,"gange_min":1.0,"runder":5,"ekstra_jogg_min":0.0,"beskrivelse":"5 × (4 min løp + 1 min gange)"},{"uke":4,"okt":2,"label":"Uke 4 økt 2","lop_min":4.0,"gange_min":1.0,"runder":5,"ekstra_jogg_min":0.0,"beskrivelse":"5 × (4 min løp + 1 min gange)"},{"uke":4,"okt":3,"label":"Uke 4 økt 3","lop_min":4.0,"gange_min":1.0,"runder":5,"ekstra_jogg_min":0.0,"beskrivelse":"5 × (4 min løp + 1 min gange)"},{"uke":5,"okt":1,"label":"Uke 5 økt 1","lop_min":5.0,"gange_min":1.5,"runder":3,"ekstra_jogg_min":10.0,"beskrivelse":"3 × (5 min løp + 1,5 min gange), 10 min rolig jogg om du orker"},{"uke":5,"okt":2,"label":"Uke 5 økt 2","lop_min":5.0,"gange_min":1.5,"runder":3,"ekstra_jogg_min":10.0,"beskrivelse":"3 × (5 min løp + 1,5 min gange), 10 min rolig jogg om du orker"},{"uke":5,"okt":3,"label":"Uke 5 økt 3","lop_min":5.0,"gange_min":1.5,"runder":3,"ekstra_jogg_min":10.0,"beskrivelse":"3 × (5 min løp + 1,5 min gange), 10 min rolig jogg om du orker"},{"uke":6,"okt":1,"label":"Uke 6 økt 1","lop_min":6.0,"gange_min":1.5,"runder":3,"ekstra_jogg_min":10.0,"beskrivelse":"3 × (6 min løp + 1,5 min gange), 10 min rolig jogg om du orker"},{"uke":6,"okt":2,"label":"Uke 6 økt 2","lop_min":6.0,"gange_min":1.5,"runder":3,"ekstra_jogg_min":10.0,"beskrivelse":"3 × (6 min løp + 1,5 min gange), 10 min rolig jogg om du orker"},{"uke":6,"okt":3,"label":"Uke 6 økt 3","lop_min":6.0,"gange_min":1.5,"runder":3,"ekstra_jogg_min":10.0,"beskrivelse":"3 × (6 min løp + 1,5 min gange), 10 min rolig jogg om du orker"},{"uke":7,"okt":1,"label":"Uke 7 økt 1","lop_min":12.0,"gange_min":2.0,"runder":2,"ekstra_jogg_min":0.0,"beskrivelse":"2 × (12 min løp + 2 min gange)"},{"uke":7,"okt":2,"label":"Uke 7 økt 2","lop_min":12.0,"gange_min":2.0,"runder":2,"ekstra_jogg_min":0.0,"beskrivelse":"2 × (12 min løp + 2 min gange)"},{"uke":7,"okt":3,"label":"Uke 7 økt 3","lop_min":12.0,"gange_min":2.0,"runder":2,"ekstra_jogg_min":0.0,"beskrivelse":"2 × (12 min løp + 2 min gange)"},{"uke":8,"okt":1,"label":"Uke 8 økt 1","lop_min":15.0,"gange_min":0.0,"runder":1,"ekstra_jogg_min":0.0,"beskrivelse":"15–20 min sammenhengende løp"},{"uke":8,"okt":2,"label":"Uke 8 økt 2","lop_min":15.0,"gange_min":0.0,"runder":1,"ekstra_jogg_min":0.0,"beskrivelse":"15–20 min sammenhengende løp"},{"uke":8,"okt":3,"label":"Uke 8 økt 3","lop_min":15.0,"gange_min":0.0,"runder":1,"ekstra_jogg_min":0.0,"beskrivelse":"Prøv hele 5 km i ditt tempo"}]}</script>
+<script type="application/json" id="site-data">{"oppdatert":"2026-11-03","okter":[{"id":"u0o0","label":"Startpunkt","uke":0,"okt":0,"dato":"2026-09-20","plan_dato":null,"lop_min":1.0,"gange_min":1.5,"antall_drag":8,"lopte_min":8.0,"km":2.39,"stigning":4.0,"tempo_s":359,"puls":152,"pause_puls":134.4,"pulsfall":30.2,"kadens":165,"steg_m":0.96,"gct_ms":274,"vo_cm":8.0,"vr_pct":8.36,"puls_drift":3.0,"tempo_drift":25.7,"ef":1.1,"steg_est":1318,"nerd":{},"drag":[{"n":1,"tempo_s":353,"puls":151,"pause_puls":131,"hoyde":-8.2,"kadens":163,"steg_m":0.99,"gct_ms":274,"vo_cm":8.18,"vr_pct":8.27,"watt":null,"watt_maks":null,"resp":null,"resp_pause":null},{"n":2,"tempo_s":331,"puls":166,"pause_puls":132,"hoyde":-2.0,"kadens":171,"steg_m":1.06,"gct_ms":265,"vo_cm":8.4,"vr_pct":8.06,"watt":null,"watt_maks":null,"resp":null,"resp_pause":null},{"n":3,"tempo_s":348,"puls":165,"pause_puls":134,"hoyde":-0.2,"kadens":168,"steg_m":1.04,"gct_ms":266,"vo_cm":8.25,"vr_pct":7.9,"watt":null,"watt_maks":null,"resp":null,"resp_pause":null},{"n":4,"tempo_s":358,"puls":167,"pause_puls":135,"hoyde":0.6,"kadens":165,"steg_m":0.98,"gct_ms":272,"vo_cm":8.1,"vr_pct":8.23,"watt":null,"watt_maks":null,"resp":null,"resp_pause":null},{"n":5,"tempo_s":380,"puls":169,"pause_puls":132,"hoyde":1.4,"kadens":162,"steg_m":0.95,"gct_ms":279,"vo_cm":8.02,"vr_pct":8.46,"watt":null,"watt_maks":null,"resp":null,"resp_pause":null},{"n":6,"tempo_s":359,"puls":162,"pause_puls":135,"hoyde":-2.8,"kadens":164,"steg_m":0.96,"gct_ms":275,"vo_cm":8.03,"vr_pct":8.39,"watt":null,"watt_maks":null,"resp":null,"resp_pause":null},{"n":7,"tempo_s":390,"puls":161,"pause_puls":138,"hoyde":-1.4,"kadens":155,"steg_m":0.84,"gct_ms":289,"vo_cm":7.42,"vr_pct":8.81,"watt":null,"watt_maks":null,"resp":null,"resp_pause":null},{"n":8,"tempo_s":360,"puls":168,"pause_puls":138,"hoyde":2.0,"kadens":170,"steg_m":0.88,"gct_ms":275,"vo_cm":7.67,"vr_pct":8.74,"watt":null,"watt_maks":null,"resp":null,"resp_pause":null}]},{"id":"u1o1","label":"Uke 1 økt 1","uke":1,"okt":1,"dato":"2026-10-24","plan_dato":"2026-10-24","lop_min":1.0,"gange_min":1.5,"antall_drag":8,"lopte_min":8.0,"km":2.46,"stigning":7.4,"tempo_s":356,"puls":154,"pause_puls":141.8,"pulsfall":28.5,"kadens":164,"steg_m":0.96,"gct_ms":279,"vo_cm":8.09,"vr_pct":8.51,"puls_drift":7.3,"tempo_drift":0.3,"ef":1.094,"steg_est":1316,"nerd":{"soner_s":[0,39,511,625,25],"watt":406,"te_aerob":3.6,"te_anaerob":1.3,"vo2max":39.0,"hjerteslag":5199,"steg":4022,"km_total":3.82,"resp_maks":41.6,"watt_maks":600,"resp":33.2,"resp_pause":36.6},"drag":[{"n":1,"tempo_s":343,"puls":154,"pause_puls":132,"hoyde":-0.8,"kadens":164,"steg_m":0.95,"gct_ms":277,"vo_cm":8.03,"vr_pct":8.47,"watt":399,"watt_maks":516,"resp":30.8,"resp_pause":35.3},{"n":2,"tempo_s":358,"puls":164,"pause_puls":134,"hoyde":2.2,"kadens":170,"steg_m":0.93,"gct_ms":278,"vo_cm":7.97,"vr_pct":8.67,"watt":419,"watt_maks":500,"resp":31.2,"resp_pause":32.8},{"n":3,"tempo_s":354,"puls":171,"pause_puls":141,"hoyde":-0.6,"kadens":166,"steg_m":1.0,"gct_ms":272,"vo_cm":8.18,"vr_pct":8.23,"watt":425,"watt_maks":498,"resp":32.8,"resp_pause":37.3},{"n":4,"tempo_s":369,"puls":167,"pause_puls":146,"hoyde":1.4,"kadens":159,"steg_m":0.95,"gct_ms":282,"vo_cm":8.07,"vr_pct":8.48,"watt":384,"watt_maks":548,"resp":36.3,"resp_pause":37.3},{"n":5,"tempo_s":370,"puls":172,"pause_puls":143,"hoyde":-0.6,"kadens":160,"steg_m":0.9,"gct_ms":285,"vo_cm":7.86,"vr_pct":8.79,"watt":371,"watt_maks":534,"resp":34.8,"resp_pause":38.5},{"n":6,"tempo_s":355,"puls":170,"pause_puls":147,"hoyde":-0.8,"kadens":170,"steg_m":1.03,"gct_ms":273,"vo_cm":8.3,"vr_pct":8.21,"watt":425,"watt_maks":600,"resp":34.7,"resp_pause":37.0},{"n":7,"tempo_s":350,"puls":171,"pause_puls":141,"hoyde":3.4,"kadens":166,"steg_m":1.0,"gct_ms":277,"vo_cm":8.39,"vr_pct":8.41,"watt":459,"watt_maks":509,"resp":32.7,"resp_pause":37.7},{"n":8,"tempo_s":351,"puls":170,"pause_puls":150,"hoyde":0.4,"kadens":161,"steg_m":0.91,"gct_ms":285,"vo_cm":7.95,"vr_pct":8.8,"watt":367,"watt_maks":450,"resp":32.5,"resp_pause":36.8}]},{"id":"u1o2","label":"Uke 1 økt 2","uke":1,"okt":2,"dato":"2026-10-26","plan_dato":"2026-10-26","lop_min":1.0,"gange_min":1.5,"antall_drag":8,"lopte_min":8.0,"km":2.39,"stigning":0,"tempo_s":364,"puls":155,"pause_puls":143.2,"pulsfall":26.1,"kadens":161,"steg_m":0.94,"gct_ms":283,"vo_cm":8.0,"vr_pct":8.54,"puls_drift":3.3,"tempo_drift":44.0,"ef":1.063,"steg_est":1283,"nerd":{"soner_s":[0,7,564,578,51],"watt":382,"te_aerob":3.4,"te_anaerob":2.0,"vo2max":39.3,"hjerteslag":4817,"steg":3728,"km_total":3.61,"resp_maks":40.6,"watt_maks":571,"resp":33.6,"resp_pause":36.0},"drag":[{"n":1,"tempo_s":343,"puls":163,"pause_puls":145,"hoyde":-2.0,"kadens":161,"steg_m":1.02,"gct_ms":283,"vo_cm":8.35,"vr_pct":8.21,"watt":404,"watt_maks":452,"resp":27.3,"resp_pause":34.0},{"n":2,"tempo_s":331,"puls":167,"pause_puls":141,"hoyde":-7.6,"kadens":162,"steg_m":0.96,"gct_ms":277,"vo_cm":7.98,"vr_pct":8.29,"watt":364,"watt_maks":471,"resp":34.2,"resp_pause":37.2},{"n":3,"tempo_s":368,"puls":165,"pause_puls":143,"hoyde":-2.0,"kadens":162,"steg_m":0.95,"gct_ms":283,"vo_cm":8.19,"vr_pct":8.6,"watt":406,"watt_maks":458,"resp":34.4,"resp_pause":35.4},{"n":4,"tempo_s":434,"puls":159,"pause_puls":136,"hoyde":-1.8,"kadens":154,"steg_m":0.93,"gct_ms":287,"vo_cm":7.84,"vr_pct":8.44,"watt":364,"watt_maks":437,"resp":31.2,"resp_pause":34.8},{"n":5,"tempo_s":299,"puls":180,"pause_puls":147,"hoyde":-1.6,"kadens":171,"steg_m":1.03,"gct_ms":264,"vo_cm":8.16,"vr_pct":7.98,"watt":479,"watt_maks":571,"resp":33.6,"resp_pause":37.4},{"n":6,"tempo_s":393,"puls":169,"pause_puls":145,"hoyde":-1.4,"kadens":157,"steg_m":0.88,"gct_ms":290,"vo_cm":7.79,"vr_pct":8.87,"watt":366,"watt_maks":442,"resp":36.5,"resp_pause":36.8},{"n":7,"tempo_s":383,"puls":168,"pause_puls":144,"hoyde":-1.4,"kadens":159,"steg_m":0.88,"gct_ms":290,"vo_cm":7.89,"vr_pct":8.94,"watt":341,"watt_maks":384,"resp":34.9,"resp_pause":38.2},{"n":8,"tempo_s":398,"puls":168,"pause_puls":145,"hoyde":-0.4,"kadens":157,"steg_m":0.88,"gct_ms":291,"vo_cm":7.81,"vr_pct":8.94,"watt":334,"watt_maks":373,"resp":36.4,"resp_pause":34.5}]},{"id":"u1o3","label":"Uke 1 økt 3","uke":1,"okt":3,"dato":"2026-10-29","plan_dato":"2026-10-28","lop_min":1.0,"gange_min":1.5,"antall_drag":6,"lopte_min":6.0,"km":1.88,"stigning":5.4,"tempo_s":350,"puls":150,"pause_puls":143.5,"pulsfall":23.8,"kadens":161,"steg_m":0.96,"gct_ms":279,"vo_cm":8.01,"vr_pct":8.37,"puls_drift":-3.0,"tempo_drift":0.0,"ef":1.143,"steg_est":966,"nerd":{"soner_s":[0,1,592,418,22],"watt":404,"te_aerob":3.2,"te_anaerob":0.5,"vo2max":39.5,"hjerteslag":4635,"steg":3685,"km_total":3.44,"resp_maks":null,"watt_maks":604},"drag":[{"n":1,"tempo_s":379,"puls":164,"pause_puls":145,"hoyde":2.4,"kadens":160,"steg_m":0.92,"gct_ms":285,"vo_cm":7.93,"vr_pct":8.62,"watt":397,"watt_maks":477,"resp":null,"resp_pause":null},{"n":2,"tempo_s":326,"puls":175,"pause_puls":143,"hoyde":2.6,"kadens":164,"steg_m":0.99,"gct_ms":272,"vo_cm":8.04,"vr_pct":8.1,"watt":428,"watt_maks":604,"resp":null,"resp_pause":null},{"n":3,"tempo_s":348,"puls":152,"pause_puls":140,"hoyde":-3.8,"kadens":161,"steg_m":0.97,"gct_ms":281,"vo_cm":8.14,"vr_pct":8.41,"watt":366,"watt_maks":462,"resp":null,"resp_pause":null},{"n":4,"tempo_s":333,"puls":166,"pause_puls":149,"hoyde":0.4,"kadens":163,"steg_m":0.98,"gct_ms":272,"vo_cm":8.01,"vr_pct":8.19,"watt":426,"watt_maks":527,"resp":null,"resp_pause":null},{"n":5,"tempo_s":347,"puls":159,"pause_puls":147,"hoyde":-0.6,"kadens":162,"steg_m":0.94,"gct_ms":282,"vo_cm":8.04,"vr_pct":8.61,"watt":419,"watt_maks":459,"resp":null,"resp_pause":null},{"n":6,"tempo_s":373,"puls":157,"pause_puls":137,"hoyde":-0.8,"kadens":156,"steg_m":0.95,"gct_ms":282,"vo_cm":7.89,"vr_pct":8.31,"watt":389,"watt_maks":468,"resp":null,"resp_pause":null}]},{"id":"u2o1","label":"Uke 2 økt 1","uke":2,"okt":1,"dato":"2026-11-01","plan_dato":"2026-10-31","lop_min":1.0,"gange_min":1.5,"antall_drag":8,"lopte_min":8.0,"km":2.37,"stigning":8.0,"tempo_s":375,"puls":147,"pause_puls":132.1,"pulsfall":29.1,"kadens":161,"steg_m":0.95,"gct_ms":284,"vo_cm":8.07,"vr_pct":8.66,"puls_drift":-1,"tempo_drift":83.3,"ef":1.088,"steg_est":1287,"nerd":{"soner_s":[11,159,742,288,0],"watt":404,"te_aerob":3.1,"te_anaerob":2.1,"vo2max":39.8,"hjerteslag":5069,"steg":3330,"km_total":3.21,"resp_maks":38.0,"watt_maks":610,"resp":28.9,"resp_pause":32.3},"drag":[{"n":1,"tempo_s":337,"puls":155,"pause_puls":126,"hoyde":2.0,"kadens":170,"steg_m":1.13,"gct_ms":262,"vo_cm":8.69,"vr_pct":7.68,"watt":520,"watt_maks":610,"resp":24.3,"resp_pause":29.8},{"n":2,"tempo_s":325,"puls":161,"pause_puls":135,"hoyde":1.0,"kadens":161,"steg_m":1.04,"gct_ms":270,"vo_cm":8.19,"vr_pct":7.9,"watt":428,"watt_maks":556,"resp":28.6,"resp_pause":31.5},{"n":3,"tempo_s":370,"puls":158,"pause_puls":130,"hoyde":0.4,"kadens":163,"steg_m":0.94,"gct_ms":284,"vo_cm":8.11,"vr_pct":8.72,"watt":402,"watt_maks":450,"resp":27.8,"resp_pause":30.3},{"n":4,"tempo_s":348,"puls":164,"pause_puls":133,"hoyde":0.2,"kadens":162,"steg_m":0.96,"gct_ms":278,"vo_cm":8.07,"vr_pct":8.39,"watt":402,"watt_maks":446,"resp":29.2,"resp_pause":32.2},{"n":5,"tempo_s":373,"puls":166,"pause_puls":134,"hoyde":1.2,"kadens":160,"steg_m":1.03,"gct_ms":277,"vo_cm":8.24,"vr_pct":8.28,"watt":438,"watt_maks":516,"resp":29.3,"resp_pause":35.3},{"n":6,"tempo_s":428,"puls":156,"pause_puls":137,"hoyde":0.8,"kadens":160,"steg_m":0.85,"gct_ms":296,"vo_cm":7.88,"vr_pct":9.34,"watt":363,"watt_maks":400,"resp":33.1,"resp_pause":34.2},{"n":7,"tempo_s":430,"puls":160,"pause_puls":131,"hoyde":1.2,"kadens":154,"steg_m":0.84,"gct_ms":301,"vo_cm":7.75,"vr_pct":9.24,"watt":346,"watt_maks":420,"resp":31.1,"resp_pause":33.6},{"n":8,"tempo_s":424,"puls":155,"pause_puls":131,"hoyde":1.2,"kadens":157,"steg_m":0.8,"gct_ms":301,"vo_cm":7.68,"vr_pct":9.62,"watt":329,"watt_maks":404,"resp":28.1,"resp_pause":31.2}]},{"id":"u2o2","label":"Uke 2 økt 2","uke":2,"okt":2,"dato":"2026-11-03","plan_dato":"2026-11-02","lop_min":1.0,"gange_min":1.5,"antall_drag":8,"lopte_min":8.0,"km":2.47,"stigning":2.2,"tempo_s":360,"puls":152,"pause_puls":137.2,"pulsfall":26,"kadens":159,"steg_m":0.96,"gct_ms":282,"vo_cm":7.96,"vr_pct":8.51,"puls_drift":12.3,"tempo_drift":-13.7,"ef":1.096,"steg_est":1274,"nerd":{"soner_s":[0,104,691,334,71],"watt":393,"te_aerob":3.1,"te_anaerob":2.6,"vo2max":39.9,"hjerteslag":3630,"steg":3079,"km_total":2.85,"resp_maks":40.5,"watt_maks":684,"resp":30.7,"resp_pause":33.4},"drag":[{"n":1,"tempo_s":400,"puls":153,"pause_puls":125,"hoyde":0.6,"kadens":156,"steg_m":0.92,"gct_ms":289,"vo_cm":7.78,"vr_pct":8.69,"watt":389,"watt_maks":452,"resp":27.8,"resp_pause":33.2},{"n":2,"tempo_s":385,"puls":153,"pause_puls":128,"hoyde":1.0,"kadens":159,"steg_m":0.93,"gct_ms":285,"vo_cm":8.0,"vr_pct":8.62,"watt":413,"watt_maks":512,"resp":31.0,"resp_pause":31.7},{"n":3,"tempo_s":365,"puls":157,"pause_puls":134,"hoyde":-1.0,"kadens":159,"steg_m":0.9,"gct_ms":286,"vo_cm":7.85,"vr_pct":8.75,"watt":389,"watt_maks":446,"resp":31.5,"resp_pause":32.6},{"n":4,"tempo_s":352,"puls":165,"pause_puls":143,"hoyde":-2.4,"kadens":160,"steg_m":0.92,"gct_ms":282,"vo_cm":7.89,"vr_pct":8.58,"watt":391,"watt_maks":461,"resp":29.7,"resp_pause":34.1},{"n":5,"tempo_s":333,"puls":171,"pause_puls":140,"hoyde":-3.0,"kadens":161,"steg_m":1.04,"gct_ms":271,"vo_cm":8.32,"vr_pct":8.04,"watt":399,"watt_maks":477,"resp":30.5,"resp_pause":34.6},{"n":6,"tempo_s":420,"puls":156,"pause_puls":140,"hoyde":-1.6,"kadens":156,"steg_m":0.79,"gct_ms":305,"vo_cm":7.65,"vr_pct":9.68,"watt":296,"watt_maks":339,"resp":32.0,"resp_pause":33.6},{"n":7,"tempo_s":425,"puls":158,"pause_puls":137,"hoyde":0.4,"kadens":158,"steg_m":0.87,"gct_ms":296,"vo_cm":7.88,"vr_pct":9.28,"watt":336,"watt_maks":383,"resp":30.5,"resp_pause":32.0},{"n":8,"tempo_s":264,"puls":186,"pause_puls":151,"hoyde":0.2,"kadens":165,"steg_m":1.31,"gct_ms":234,"vo_cm":8.26,"vr_pct":6.67,"watt":532,"watt_maks":684,"resp":32.3,"resp_pause":35.6}]}],"styrke":[{"dato":"2026-10-27","fokus_en":"Hips, glutes and running strength","fokus_no":"Hofte, sete og løpsstyrke","min":55,"puls":110,"rpe":null,"ovelser_no":["Sykkel 5 min","katt-ku 3x10","beinsving","hoftesirkler","inchworm","90/90","hoftebøyertøy","utfall m/rotasjon","ettbeins setehev","sideplanke","dead bug","ettbeins markløft","tåhev","balanserende knebøy","duestilling"],"ovelser_en":["Bike warm-up 5 min","Cat-cow 3x10","Leg swings","Hip circles","Inchworm","90/90","Hip flexor stretch","Lunge with rotation","Single-leg glute bridge","Side plank","Dead bug","Single-leg deadlift","Calf raises","Balance squat","Pigeon pose"]}],"plan":[{"uke":1,"okt":1,"label":"Uke 1 økt 1","dato":"2026-10-24","lop_min":1.0,"gange_min":1.5,"runder":8,"ekstra_jogg_min":0.0,"beskrivelse":"8 × (1 min løp + 1,5 min gange)"},{"uke":1,"okt":2,"label":"Uke 1 økt 2","dato":"2026-10-26","lop_min":1.0,"gange_min":1.5,"runder":8,"ekstra_jogg_min":0.0,"beskrivelse":"8 × (1 min løp + 1,5 min gange)"},{"uke":1,"okt":3,"label":"Uke 1 økt 3","dato":"2026-10-28","lop_min":1.0,"gange_min":1.5,"runder":8,"ekstra_jogg_min":0.0,"beskrivelse":"8 × (1 min løp + 1,5 min gange)"},{"uke":2,"okt":1,"label":"Uke 2 økt 1","dato":"2026-10-31","lop_min":1.0,"gange_min":1.5,"runder":8,"ekstra_jogg_min":0.0,"beskrivelse":"8 × (1 min løp + 1,5 min gange)"},{"uke":2,"okt":2,"label":"Uke 2 økt 2","dato":"2026-11-02","lop_min":1.0,"gange_min":1.5,"runder":8,"ekstra_jogg_min":0.0,"beskrivelse":"8 × (1 min løp + 1,5 min gange)"},{"uke":2,"okt":3,"label":"Uke 2 økt 3","dato":"2026-11-04","lop_min":1.0,"gange_min":1.5,"runder":8,"ekstra_jogg_min":0.0,"beskrivelse":"8 × (1 min løp + 1,5 min gange)"},{"uke":3,"okt":1,"label":"Uke 3 økt 1","dato":"2026-11-07","lop_min":2.0,"gange_min":1.0,"runder":6,"ekstra_jogg_min":0.0,"beskrivelse":"6 × (2 min løp + 1 min gange)"},{"uke":3,"okt":2,"label":"Uke 3 økt 2","dato":"2026-11-09","lop_min":2.0,"gange_min":1.0,"runder":6,"ekstra_jogg_min":0.0,"beskrivelse":"6 × (2 min løp + 1 min gange)"},{"uke":3,"okt":3,"label":"Uke 3 økt 3","dato":"2026-11-11","lop_min":2.0,"gange_min":1.0,"runder":6,"ekstra_jogg_min":0.0,"beskrivelse":"6 × (2 min løp + 1 min gange)"},{"uke":4,"okt":1,"label":"Uke 4 økt 1","dato":"2026-11-14","lop_min":4.0,"gange_min":1.0,"runder":5,"ekstra_jogg_min":0.0,"beskrivelse":"5 × (4 min løp + 1 min gange)"},{"uke":4,"okt":2,"label":"Uke 4 økt 2","dato":"2026-11-16","lop_min":4.0,"gange_min":1.0,"runder":5,"ekstra_jogg_min":0.0,"beskrivelse":"5 × (4 min løp + 1 min gange)"},{"uke":4,"okt":3,"label":"Uke 4 økt 3","dato":"2026-11-18","lop_min":4.0,"gange_min":1.0,"runder":5,"ekstra_jogg_min":0.0,"beskrivelse":"5 × (4 min løp + 1 min gange)"},{"uke":5,"okt":1,"label":"Uke 5 økt 1","dato":"2026-11-21","lop_min":5.0,"gange_min":1.5,"runder":3,"ekstra_jogg_min":10.0,"beskrivelse":"3 × (5 min løp + 1,5 min gange), 10 min rolig jogg om du orker"},{"uke":5,"okt":2,"label":"Uke 5 økt 2","dato":"2026-11-23","lop_min":5.0,"gange_min":1.5,"runder":3,"ekstra_jogg_min":10.0,"beskrivelse":"3 × (5 min løp + 1,5 min gange), 10 min rolig jogg om du orker"},{"uke":5,"okt":3,"label":"Uke 5 økt 3","dato":"2026-11-25","lop_min":5.0,"gange_min":1.5,"runder":3,"ekstra_jogg_min":10.0,"beskrivelse":"3 × (5 min løp + 1,5 min gange), 10 min rolig jogg om du orker"},{"uke":6,"okt":1,"label":"Uke 6 økt 1","dato":"2026-11-28","lop_min":6.0,"gange_min":1.5,"runder":3,"ekstra_jogg_min":10.0,"beskrivelse":"3 × (6 min løp + 1,5 min gange), 10 min rolig jogg om du orker"},{"uke":6,"okt":2,"label":"Uke 6 økt 2","dato":"2026-11-30","lop_min":6.0,"gange_min":1.5,"runder":3,"ekstra_jogg_min":10.0,"beskrivelse":"3 × (6 min løp + 1,5 min gange), 10 min rolig jogg om du orker"},{"uke":6,"okt":3,"label":"Uke 6 økt 3","dato":"2026-12-02","lop_min":6.0,"gange_min":1.5,"runder":3,"ekstra_jogg_min":10.0,"beskrivelse":"3 × (6 min løp + 1,5 min gange), 10 min rolig jogg om du orker"},{"uke":7,"okt":1,"label":"Uke 7 økt 1","dato":"2026-12-05","lop_min":12.0,"gange_min":2.0,"runder":2,"ekstra_jogg_min":0.0,"beskrivelse":"2 × (12 min løp + 2 min gange)"},{"uke":7,"okt":2,"label":"Uke 7 økt 2","dato":"2026-12-07","lop_min":12.0,"gange_min":2.0,"runder":2,"ekstra_jogg_min":0.0,"beskrivelse":"2 × (12 min løp + 2 min gange)"},{"uke":7,"okt":3,"label":"Uke 7 økt 3","dato":"2026-12-09","lop_min":12.0,"gange_min":2.0,"runder":2,"ekstra_jogg_min":0.0,"beskrivelse":"2 × (12 min løp + 2 min gange)"},{"uke":8,"okt":1,"label":"Uke 8 økt 1","dato":"2026-12-12","lop_min":15.0,"gange_min":0.0,"runder":1,"ekstra_jogg_min":0.0,"beskrivelse":"15–20 min sammenhengende løp"},{"uke":8,"okt":2,"label":"Uke 8 økt 2","dato":"2026-12-14","lop_min":15.0,"gange_min":0.0,"runder":1,"ekstra_jogg_min":0.0,"beskrivelse":"15–20 min sammenhengende løp"},{"uke":8,"okt":3,"label":"Uke 8 økt 3","dato":"2026-12-16","lop_min":15.0,"gange_min":0.0,"runder":1,"ekstra_jogg_min":0.0,"beskrivelse":"Prøv hele 5 km i ditt tempo"}]}</script>
 <script type="application/json" id="video-data">[]
 </script>
 <script>
@@ -448,7 +523,7 @@ const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).
 /* ---------- Tekster ---------- */
 const T = {
  en:{
-  nav_journey:'The journey',nav_run:'Latest run',nav_log:'Log',nav_vlog:'Vlog',nav_about:'About',
+  nav_journey:'The journey',nav_cal:'Calendar',nav_run:'Latest run',nav_log:'Log',nav_vlog:'Vlog',nav_about:'About',
   tagline:'From the couch to 5K. One run at a time, with all the numbers on the table.',watch:'Watch the vlog',
   j_eyebrow:'The journey so far',j_title:'8 weeks. 24 runs. 5K.',
   j_lead:'The program is Couch to 5K: three runs a week, with the running intervals getting a little longer each week. Each bar is one run, and its height shows the total minutes of running.',
@@ -513,10 +588,31 @@ const T = {
   zone:z=>`Zone ${z}`, zoneTip:(l,z,m,p)=>`${l}\nZone ${z}: ${m} min (${p} %)`,
   g_run:'Run',g_w:'Power',g_te_a:'Aerobic TE',g_te_an:'Anaerobic TE',g_vo2:'VO2 max',
   tot_beats:'heartbeats',tot_steps:'steps',tot_km:'on the sofa-o-meter',
-  tip_ef:'m per heartbeat',tip_drift:(l,v)=>`${l}: ${v} bpm`
+  tip_ef:'m per heartbeat',tip_drift:(l,v)=>`${l}: ${v} bpm`,
+  rw:['The plan is based on ','Runner\u2019s World Norway\u2019s \u201cFra sofa til 5 km\u201d program','.'],
+  k_eyebrow:'Plan vs. reality',k_title:'The training calendar',
+  k_lead:'Planned runs next to the ones I actually did. Life happens, so runs sometimes move a day or two. Tap a completed run to see the details.',
+  dows:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+  months:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+  sum_done:(a,b)=>[`${a} of ${b}`,'planned runs done so far'], sum_moved:n=>[String(n),n===1?'run moved':'runs moved'], sum_str:n=>[String(n),n===1?'strength session':'strength sessions'],
+  ev_str:'Strength', ev_moved:'moved',
+  lg_run:'Completed run',lg_part:'Partly completed',lg_plan:'Planned',lg_next:'Next run',lg_moved:'Moved from here',lg_str:'Strength',
+  tip_run:(l,d,pd)=>`${l}\nDone ${d}`+(pd?`\nPlanned ${pd}`:''), tip_part:(a,b)=>`\n${a} of ${b} intervals`,
+  tip_plan:(l,desc)=>`${l} (planned)\n${desc}`, tip_movedto:(l,d)=>`${l} was moved to ${d}`,
+  tip_str:(f,m)=>`Strength: ${f}`+(m?`\n${m} min`:''),
+  s_title:'Strength and injury prevention',
+  s_lead:'Going from zero to running puts a lot of new load on muscles, tendons and joints. Strength and mobility sessions for hips, glutes and core help the body handle it, so I can keep running week after week instead of ending up on the sidelines.',
+  s_min:m=>`${m} min`, s_hr:p=>`avg HR ${p}`, s_none:'No strength sessions logged yet.',
+  c_pow:'Power per interval',c_pow_sub:'Average running power in watts, measured by the watch. The small line shows the highest 3-second average in each interval.',
+  c_resp:'Breathing',c_resp_sub:'Breaths per minute, estimated from the heart rate strap. Running vs. the walk break after.',
+  lg_wavg:'Average',lg_wmax:'Max',lg_rrun:'Running',lg_rwalk:'Walk break',lg_rmax:'Max',
+  tip_w:(n,a,m)=>`Interval ${n}\nAverage ${a} W\nMax ${m} W`, tip_r:(n,a,b)=>`Interval ${n}\nRunning ${a} br/min\nWalk break ${b} br/min`,
+  n_powt:'Running power',n_powt_sub:'Average and highest power in the running intervals, run by run.',
+  n_respt:'Breathing rate',n_respt_sub:'Average breaths per minute while running and walking, plus the highest value in the run.',
+  rec_watt:'highest power in an interval', g_wmax:'Max W', u_br:'br/min'
  },
  no:{
-  nav_journey:'Reisen',nav_run:'Siste økt',nav_log:'Loggen',nav_vlog:'Vlogg',nav_about:'Om',
+  nav_journey:'Reisen',nav_cal:'Kalender',nav_run:'Siste økt',nav_log:'Loggen',nav_vlog:'Vlogg',nav_about:'Om',
   tagline:'Fra sofaen til 5 km. Én økt om gangen, med alle tallene på bordet.',watch:'Se vloggen',
   j_eyebrow:'Reisen så langt',j_title:'8 uker. 24 økter. 5 km.',
   j_lead:'Programmet er Sofa til 5k: tre økter i uka der løpebitene blir litt lengre hver uke. Hver stolpe er én økt, og høyden viser hvor mange minutter jeg skal løpe totalt.',
@@ -581,7 +677,28 @@ const T = {
   zone:z=>`Sone ${z}`, zoneTip:(l,z,m,p)=>`${l}\nSone ${z}: ${m} min (${p} %)`,
   g_run:'Økt',g_w:'Watt',g_te_a:'Aerob TE',g_te_an:'Anaerob TE',g_vo2:'VO2maks',
   tot_beats:'hjerteslag',tot_steps:'steg',tot_km:'på sofa-o-meteret',
-  tip_ef:'m per hjerteslag',tip_drift:(l,v)=>`${l}: ${v} slag/min`
+  tip_ef:'m per hjerteslag',tip_drift:(l,v)=>`${l}: ${v} slag/min`,
+  rw:['Planen bygger på ','Runner\u2019s World Norges program \u00abFra sofa til 5 km\u00bb','.'],
+  k_eyebrow:'Plan mot virkelighet',k_title:'Treningskalenderen',
+  k_lead:'Planlagte økter ved siden av de jeg faktisk gjennomførte. Livet skjer, så økter flyttes av og til en dag eller to. Trykk på en gjennomført økt for å se detaljene.',
+  dows:['Man','Tir','Ons','Tor','Fre','Lør','Søn'],
+  months:['jan','feb','mar','apr','mai','jun','jul','aug','sep','okt','nov','des'],
+  sum_done:(a,b)=>[`${a} av ${b}`,'planlagte økter gjennomført så langt'], sum_moved:n=>[String(n),n===1?'økt flyttet':'økter flyttet'], sum_str:n=>[String(n),n===1?'styrkeøkt':'styrkeøkter'],
+  ev_str:'Styrke', ev_moved:'flyttet',
+  lg_run:'Gjennomført',lg_part:'Delvis gjennomført',lg_plan:'Planlagt',lg_next:'Neste økt',lg_moved:'Flyttet herfra',lg_str:'Styrke',
+  tip_run:(l,d,pd)=>`${l}\nGjennomført ${d}`+(pd?`\nPlanlagt ${pd}`:''), tip_part:(a,b)=>`\n${a} av ${b} løpebiter`,
+  tip_plan:(l,desc)=>`${l} (planlagt)\n${desc}`, tip_movedto:(l,d)=>`${l} ble flyttet til ${d}`,
+  tip_str:(f,m)=>`Styrke: ${f}`+(m?`\n${m} min`:''),
+  s_title:'Styrke og skadeforebygging',
+  s_lead:'Å gå fra null til løping gir mye ny belastning på muskler, sener og ledd. Styrke- og mobilitetsøkter for hofte, sete og kjerne hjelper kroppen å tåle det, så jeg kan fortsette å løpe uke etter uke i stedet for å havne på sidelinjen.',
+  s_min:m=>`${m} min`, s_hr:p=>`snittpuls ${p}`, s_none:'Ingen styrkeøkter logget ennå.',
+  c_pow:'Watt per løpebit',c_pow_sub:'Snitt løpekraft i watt, målt av klokka. Den lille streken viser høyeste 3-sekunders snitt i hver løpebit.',
+  c_resp:'Pust',c_resp_sub:'Åndedrag per minutt, beregnet fra pulsbeltet. Løping mot gåpausen etter.',
+  lg_wavg:'Snitt',lg_wmax:'Maks',lg_rrun:'Løping',lg_rwalk:'Gåpause',lg_rmax:'Maks',
+  tip_w:(n,a,m)=>`Løpebit ${n}\nSnitt ${a} W\nMaks ${m} W`, tip_r:(n,a,b)=>`Løpebit ${n}\nLøping ${a} pust/min\nGåpause ${b} pust/min`,
+  n_powt:'Løpekraft',n_powt_sub:'Snitt og høyeste watt i løpebitene, økt for økt.',
+  n_respt:'Respirasjonsfrekvens',n_respt_sub:'Snitt åndedrag per minutt under løping og gåing, og høyeste verdi i økta.',
+  rec_watt:'høyeste watt i en løpebit', g_wmax:'Maks W', u_br:'pust/min'
  }
 };
 let lang='en';
@@ -671,7 +788,8 @@ function statTile(v,unit,k){
   d.innerHTML='<div class="v num"><span></span><small></small></div><div class="k"></div>';
   d.querySelector('span').textContent=v;d.querySelector('small').textContent=unit;d.querySelector('.k').textContent=k;return d;
 }
-function drawSession(){
+function drawSession(){ drawSessionBase(); drawSessionExtra(okter.find(x=>keyOf(x)===current)); }
+function drawSessionBase(){
   const o=okter.find(x=>keyOf(x)===current), last=o===okter[okter.length-1];
   $('okt-tittel').textContent = last ? L().latest(labelOf(o)) : labelOf(o);
   const p = plan.find(x=>keyOf(x)===keyOf(o));
@@ -735,6 +853,131 @@ function drawSession(){
   }
 }
 
+/* Watt og pust per løpebit (egen funksjon, kalles fra drawSession) */
+function drawSessionExtra(o){
+  const n=o.drag.length, H=200;
+  { const host=$('c-watt'), has=o.drag.some(d=>d.watt);
+    if(!has){pendingBox(host);} else {
+    const [s,W]=svgBox(host,H); const m={l:40,r:6,t:12,b:28},iw=W-m.l-m.r,ih=H-m.t-m.b;
+    const hi=Math.max(500,...o.drag.map(d=>d.watt_maks||0)), lo=0, ticks=niceTicks(lo,hi,4), top=ticks[ticks.length-1];
+    const y=v=>m.t+ih-(v-lo)/(top-lo)*ih, bw=iw/n;
+    gridY(s,ticks,y,m,W);
+    o.drag.forEach((d,i)=>{
+      const x=m.l+i*bw;
+      if(d.watt){const r=el('rect',{x:x+bw*.2,y:y(d.watt),width:bw*.6,height:y(0)-y(d.watt),rx:3,fill:css('--pink')},s);
+        bindTip(r,L().tip_w(d.n,d.watt,d.watt_maks??'–'));}
+      if(d.watt_maks){const t=el('line',{x1:x+bw*.22,x2:x+bw*.78,y1:y(d.watt_maks),y2:y(d.watt_maks),stroke:css('--volt'),'stroke-width':3,'stroke-linecap':'round'},s);
+        bindTip(t,L().tip_w(d.n,d.watt??'–',d.watt_maks));}
+      txt(s,{x:x+bw/2,y:H-8,'text-anchor':'middle'},d.n);
+    });}
+  }
+  { const host=$('c-resp'), has=o.drag.some(d=>d.resp);
+    if(!has){pendingBox(host);} else {
+    const [s,W]=svgBox(host,H); const m={l:36,r:6,t:12,b:28},iw=W-m.l-m.r,ih=H-m.t-m.b;
+    const vals=o.drag.flatMap(d=>[d.resp,d.resp_pause]).filter(v=>v), lo=Math.min(15,...vals), hi=Math.max(45,...vals);
+    const ticks=niceTicks(lo,hi,4), y=v=>m.t+ih-(v-lo)/(hi-lo)*ih, bw=iw/n;
+    gridY(s,ticks,y,m,W);
+    o.drag.forEach((d,i)=>{
+      const cx=m.l+i*bw+bw/2, t=L().tip_r(d.n,d.resp!=null?nf(d.resp,1):'–',d.resp_pause!=null?nf(d.resp_pause,1):'–');
+      if(d.resp&&d.resp_pause) el('line',{x1:cx,x2:cx,y1:y(d.resp),y2:y(d.resp_pause),stroke:css('--dim'),'stroke-width':3,'stroke-linecap':'round'},s);
+      if(d.resp){const c=el('circle',{cx,cy:y(d.resp),r:6,fill:css('--pink')},s);bindTip(c,t);}
+      if(d.resp_pause){const c=el('circle',{cx,cy:y(d.resp_pause),r:6,fill:css('--volt')},s);bindTip(c,t);}
+      txt(s,{x:cx,y:H-8,'text-anchor':'middle'},d.n);
+    });}
+  }
+}
+
+/* Flere serier over øktene (for watt og pust), hopper over økter uten data */
+function multiTrend(hostId,series,lo,hi,fmt,unit){
+  const host=$(hostId), rows=okter.filter(o=>series.some(sr=>sr.get(o)!=null));
+  if(!rows.length){pendingBox(host);return}
+  const H=200,[s,W]=svgBox(host,H); const m={l:40,r:14,t:14,b:30},iw=W-m.l-m.r,ih=H-m.t-m.b;
+  const vals=rows.flatMap(o=>series.map(sr=>sr.get(o))).filter(v=>v!=null);
+  const a=Math.min(lo,...vals), b=Math.max(hi,...vals), n=rows.length;
+  const y=v=>m.t+ih-(v-a)/(b-a)*ih, x=i=>m.l+(n===1?iw/2:i*iw/(n-1));
+  gridY(s,niceTicks(a,b,4),y,m,W,v=>nf(v,0));
+  series.forEach(sr=>{
+    const pts=rows.map((o,i)=>[i,sr.get(o)]).filter(p=>p[1]!=null);
+    if(pts.length>1) el('path',{d:'M'+pts.map(p=>`${x(p[0])},${y(p[1])}`).join(' L'),fill:'none',stroke:sr.color,'stroke-width':2.5,'stroke-linejoin':'round','stroke-dasharray':sr.dash||''},s);
+    pts.forEach(p=>{const c=el('circle',{cx:x(p[0]),cy:y(p[1]),r:4.5,fill:sr.color},s);bindTip(c,`${labelOf(rows[p[0]])}\n${sr.name()}: ${fmt(p[1])} ${unit}`)});
+  });
+  rows.forEach((o,i)=>txt(s,{x:x(i),y:H-8,'text-anchor':i===0?'start':i===n-1?'end':'middle'},o.uke===0?L().start:L().short(o.uke,o.okt)));
+}
+
+/* ---------- Kalender og styrke ---------- */
+const isoD=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const parseD=s=>{const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
+const fmtD=s=>{const d=parseD(s);return lang==='no'?`${d.getDate()}. ${L().months[d.getMonth()]}`:`${d.getDate()} ${L().months[d.getMonth()]}`};
+function evBtn(cls,text,tipText,onClick){
+  const b=document.createElement(onClick?'button':'span');if(onClick)b.type='button';
+  b.className='ev '+cls;b.textContent=text;bindTip(b,tipText);if(onClick)b.addEventListener('click',onClick);return b;
+}
+function renderCalendar(){
+  const cal=$('cal'); cal.replaceChildren();
+  const today=isoD(new Date());
+  const done=new Map(prog.map(o=>[o.dato,o]));
+  const planBy=new Map(); plan.forEach(p=>{if(!planBy.has(p.dato))planBy.set(p.dato,[]);planBy.get(p.dato).push(p)});
+  const strBy=new Map(); (D.styrke||[]).forEach(t=>{if(!strBy.has(t.dato))strBy.set(t.dato,[]);strBy.get(t.dato).push(t)});
+  const first=parseD(plan[0].dato), last=parseD(plan[plan.length-1].dato);
+  const start=new Date(first); start.setDate(start.getDate()-((start.getDay()+6)%7));
+  const end=new Date(last); end.setDate(end.getDate()+(6-(end.getDay()+6)%7));
+  L().dows.forEach(d=>{const h=document.createElement('div');h.className='dow';h.textContent=d;cal.appendChild(h)});
+  for(let d=new Date(start);d<=end;d.setDate(d.getDate()+1)){
+    const iso=isoD(d), cell=document.createElement('div'); cell.className='day'; cell.setAttribute('role','gridcell');
+    if(d<first) cell.classList.add('out'); if(iso===today) cell.classList.add('today');
+    const dn=document.createElement('div');dn.className='dn';
+    dn.textContent=(d.getDate()===1||iso===isoD(start))?`${d.getDate()}. ${L().months[d.getMonth()]}`:d.getDate();
+    if(lang==='en'&&(d.getDate()===1||iso===isoD(start))) dn.textContent=`${d.getDate()} ${L().months[d.getMonth()]}`;
+    cell.appendChild(dn);
+    const o=done.get(iso);
+    if(o){
+      const p=plan.find(x=>keyOf(x)===keyOf(o)), part=p&&o.antall_drag<p.runder;
+      const lbl=L().short(o.uke,o.okt)+(part?` · ${o.antall_drag}/${p.runder}`:'');
+      let t=L().tip_run(labelOf(o),fmtD(o.dato),p&&p.dato!==o.dato?fmtD(p.dato):null)+(part?L().tip_part(o.antall_drag,p.runder):'');
+      cell.appendChild(evBtn(part?'part':'run',lbl,t,()=>{current=keyOf(o);renderChips();drawSession();$('okta').scrollIntoView({behavior:'smooth'})}));
+    }
+    (planBy.get(iso)||[]).forEach(p=>{
+      const o2=prog.find(x=>keyOf(x)===keyOf(p));
+      if(o2&&o2.dato===iso) return;
+      if(o2) cell.appendChild(evBtn('moved',L().short(p.uke,p.okt)+' →',L().tip_movedto(L().runLabel(p.uke,p.okt),fmtD(o2.dato))));
+      else{const isNext=next&&keyOf(p)===keyOf(next);
+        cell.appendChild(evBtn(isNext?'next':'plan',L().short(p.uke,p.okt),L().tip_plan(L().runLabel(p.uke,p.okt),L().desc(p))));}
+    });
+    (strBy.get(iso)||[]).forEach(t=>cell.appendChild(evBtn('str',L().ev_str,L().tip_str(lang==='no'?t.fokus_no:t.fokus_en,t.min))));
+    cal.appendChild(cell);
+  }
+  // Sammendrag
+  const due=plan.filter(p=>p.dato<=today), doneDue=due.filter(p=>prog.some(o=>keyOf(o)===keyOf(p))).length;
+  const moved=prog.filter(o=>{const p=plan.find(x=>keyOf(x)===keyOf(o));return p&&p.dato!==o.dato}).length;
+  const sum=$('cal-sum'); sum.replaceChildren();
+  [L().sum_done(doneDue,due.length),L().sum_moved(moved),L().sum_str((D.styrke||[]).length)].forEach(([b,t])=>{
+    const sp=document.createElement('span');const bb=document.createElement('b');bb.textContent=b;sp.append(bb,' '+t);sum.appendChild(sp)});
+  // Forklaring
+  const lg=$('cal-legend'); lg.replaceChildren();
+  [['run',L().lg_run],['part',L().lg_part],['next',L().lg_next],['plan',L().lg_plan],['moved',L().lg_moved],['str',L().lg_str]].forEach(([c,t])=>{
+    const sp=document.createElement('span');const e=document.createElement('span');e.className='ev '+c;e.textContent='  ';sp.append(e,' '+t);lg.appendChild(sp)});
+}
+function renderStrength(){
+  const host=$('strength'); host.replaceChildren();
+  const list=[...(D.styrke||[])].reverse();
+  if(!list.length){const p=document.createElement('p');p.className='pending';p.textContent=L().s_none;host.appendChild(p);return}
+  list.forEach(t=>{
+    const c=document.createElement('article');c.className='scard';
+    const top=document.createElement('div');top.className='shead';
+    const d=document.createElement('span');d.className='d';d.textContent=fmtD(t.dato);
+    const m=document.createElement('span');m.className='m';m.textContent=[t.min?L().s_min(t.min):null,t.puls?L().s_hr(t.puls):null].filter(Boolean).join(' · ');
+    top.append(d,m);
+    const h=document.createElement('h4');h.textContent=lang==='no'?t.fokus_no:t.fokus_en;
+    const tags=document.createElement('div');tags.className='tags';
+    (lang==='no'?t.ovelser_no:t.ovelser_en).forEach(x=>{const sp=document.createElement('span');sp.textContent=x.charAt(0).toUpperCase()+x.slice(1);tags.appendChild(sp)});
+    c.append(top,h,tags);host.appendChild(c);
+  });
+}
+function renderRW(){
+  const p=$('rw-src'),[a,b,c]=L().rw;p.replaceChildren(a);
+  const l=document.createElement('a');l.href='https://runnersworld.no/fra-sofa-til-5km/';l.target='_blank';l.rel='noopener';l.textContent=b;p.append(l,c);
+}
+
 /* ---------- Utvikling ---------- */
 function trend(host,key,unit,lo,hi,color,fmt,H=200){
   const [s,W]=svgBox($(host),H); const m={l:36,r:14,t:14,b:30},iw=W-m.l-m.r,ih=H-m.t-m.b;
@@ -771,17 +1014,19 @@ function renderNerdText(){
       tile(pace(fast.t),'/km',L().rec_fast,L().in_run(labelOf(fast.o))+' · #'+fast.n),
       tile(String(Math.round(drop.v)),L().u_beats,L().rec_drop,L().in_run(labelOf(drop.o))+' · #'+drop.n),
       tile(nf(ef.ef,2),L().u_mpb,L().rec_ef,L().in_run(labelOf(ef))));
+    const wm=prog.filter(o=>o.nerd&&o.nerd.watt_maks);
+    if(wm.length){const b=wm.reduce((a,o)=>o.nerd.watt_maks>a.nerd.watt_maks?o:a);r.append(tile(String(b.nerd.watt_maks),'W',L().rec_watt,L().in_run(labelOf(b))));}
   }
   // Garmin-tabell
   const g=$('garmin'), withG=okter.filter(o=>o.nerd&&(o.nerd.watt||o.nerd.te_aerob||o.nerd.vo2max));
   if(!withG.length) pendingBox(g); else {
     const wrap=document.createElement('div');wrap.className='tablewrap';
     const t=document.createElement('table');t.className='garmin';t.style.minWidth='420px';
-    const hr=document.createElement('tr');[L().g_run,L().g_w,L().g_te_a,L().g_te_an,L().g_vo2].forEach(h=>{const th=document.createElement('th');th.scope='col';th.textContent=h;hr.appendChild(th)});
+    const hr=document.createElement('tr');[L().g_run,L().g_w,L().g_wmax,L().g_te_a,L().g_te_an,L().g_vo2].forEach(h=>{const th=document.createElement('th');th.scope='col';th.textContent=h;hr.appendChild(th)});
     const th=document.createElement('thead');th.appendChild(hr);t.appendChild(th);
     const tb=document.createElement('tbody');
     [...withG].reverse().forEach(o=>{const tr=document.createElement('tr');const n=o.nerd;
-      [labelOf(o),n.watt?n.watt+' W':'–',n.te_aerob!=null?nf(n.te_aerob,1):'–',n.te_anaerob!=null?nf(n.te_anaerob,1):'–',n.vo2max?nf(n.vo2max,0):'–']
+      [labelOf(o),n.watt?n.watt+' W':'–',n.watt_maks?n.watt_maks+' W':'–',n.te_aerob!=null?nf(n.te_aerob,1):'–',n.te_anaerob!=null?nf(n.te_anaerob,1):'–',n.vo2max?nf(n.vo2max,0):'–']
       .forEach((c,i)=>{const td=document.createElement(i?'td':'th');if(!i)td.scope='row';td.textContent=c;tr.appendChild(td)});tb.appendChild(tr)});
     t.appendChild(tb);wrap.appendChild(t);g.replaceChildren(wrap);
   }
@@ -796,6 +1041,8 @@ function renderNerdText(){
 }
 function drawNerd(){
   if(!nd.open) return;
+  multiTrend('c-powt',[{get:o=>o.nerd&&o.nerd.watt,color:css('--pink'),name:()=>L().lg_wavg},{get:o=>o.nerd&&o.nerd.watt_maks,color:css('--volt'),name:()=>L().lg_wmax}],300,650,v=>Math.round(v),'W');
+  multiTrend('c-respt',[{get:o=>o.nerd&&o.nerd.resp,color:css('--pink'),name:()=>L().lg_rrun},{get:o=>o.nerd&&o.nerd.resp_pause,color:css('--volt'),name:()=>L().lg_rwalk},{get:o=>o.nerd&&o.nerd.resp_maks,color:css('--muted'),name:()=>L().lg_rmax,dash:'4 4'}],20,45,v=>nf(v,1),L().u_br);
   trend('c-ef','ef',L().tip_ef,1.0,1.2,css('--volt'),v=>nf(v,2));
   trend('c-gct','gct_ms','ms',265,295,css('--pink'),v=>Math.round(v),160);
   trend('c-vo','vo_cm','cm',7.6,8.4,css('--pink'),v=>nf(v,2),160);
@@ -894,7 +1141,7 @@ function applyLang(){
   $('hero-img').alt=L().alt_hero; $('vlog-img').alt=L().alt_vlog; $('om-img').alt=L().alt_om;
   $('lang-en').setAttribute('aria-pressed',lang==='en'); $('lang-no').setAttribute('aria-pressed',lang==='no');
   $('about-text').replaceChildren(...(REVEAL?REVEAL[lang]:L().about).map(t=>{const p=document.createElement('p');p.textContent=t;return p}));
-  renderTop(); renderChips(); renderLog(); renderVideos(); drawAll();
+  renderTop(); renderRW(); renderCalendar(); renderStrength(); renderChips(); renderLog(); renderVideos(); drawAll();
 }
 function setLang(l){lang=l;try{localStorage.setItem('lb5k-lang',l)}catch(e){}applyLang()}
 $('lang-en').addEventListener('click',()=>setLang('en'));
