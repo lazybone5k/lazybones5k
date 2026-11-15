@@ -186,6 +186,12 @@ details.nerd[open] .nerd-toggle{background:var(--volt);color:var(--ink)}
 .ev.run[data-f],.ev.part[data-f]{box-shadow:inset 0 -4px 0 var(--fc)}
 .feel-pill{display:inline-block;font-family:var(--f-num);font-weight:700;border-radius:999px;padding:1px 9px;color:#120c15;font-size:.9rem}
 @media (max-width:560px){.diary{grid-template-columns:1fr}.feel{display:flex;gap:10px;align-items:baseline;justify-content:center}.feel b{font-size:1.4rem}}
+.baro{margin-bottom:16px}
+.baro-top{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;margin-bottom:10px}
+.verdict{display:inline-flex;align-items:center;gap:10px;border-radius:999px;padding:8px 16px;font-family:var(--f-num);font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#120c15}
+.verdict svg{width:20px;height:20px}
+.verdict.up{background:var(--volt)} .verdict.flat{background:var(--z2)} .verdict.down{background:var(--z4)}
+.baro-why{color:var(--muted);font-size:.95rem;max-width:60ch;margin:0}
 .tip{position:fixed;z-index:20;pointer-events:none;background:var(--panel-2);border:1px solid var(--dim);color:var(--fg);padding:6px 10px;border-radius:8px;font-family:var(--f-num);font-size:.95rem;white-space:pre;box-shadow:0 6px 20px rgba(0,0,0,.4)}
 
 @media (max-width:720px){
@@ -323,6 +329,13 @@ details.nerd[open] .nerd-toggle{background:var(--volt);color:var(--ink)}
           <h2 data-i18n="p_title">Is it getting easier?</h2>
           <p class="lead" data-i18n="p_lead">Averages for the running intervals in each run. The baseline is a test run I did before the program started. From week 2 I'm deliberately running slower to find a good flow, so the pace drops a little and the heart rate comes down with it.</p>
         </div>
+      </div>
+      <div class="panel baro">
+        <h3 data-i18n="b_title">Form barometer</h3>
+        <p class="sub" data-i18n="b_sub">How much I run compared to how hard my heart has to work: kilometres run in the intervals divided by average heart rate, with the first run of the program set to 100. Higher means more running for the same effort. The dots show Garmin's VO2 max estimate.</p>
+        <div class="baro-top"><span class="verdict" id="b-verdict">–</span><p class="baro-why" id="b-why"></p></div>
+        <div id="c-baro"></div>
+        <div class="legend"><span><i style="background:var(--pink)"></i><span data-i18n="lg_bidx">Form index (left axis)</span></span><span><i style="background:var(--volt);border-radius:50%"></i><span data-i18n="lg_bvo2">VO2 max (right axis)</span></span></div>
       </div>
       <div class="grid2">
         <div class="panel"><h3 data-i18n="t_hr">Average heart rate in the intervals</h3><p class="sub" data-i18n="t_hr_sub">Beats per minute.</p><div id="c-trend-puls"></div></div>
@@ -648,6 +661,12 @@ const T = {
   n_powt:'Running power',n_powt_sub:'Average and highest power in the running intervals, run by run.',
   n_respt:'Breathing rate',n_respt_sub:'Average breaths per minute while running and walking, plus the highest value in the run.',
   rec_watt:'highest power in an interval', g_wmax:'Max W', u_br:'br/min',
+  b_title:'Form barometer', b_sub:'How much I run compared to how hard my heart has to work: kilometres run in the intervals divided by average heart rate, with the first run of the program set to 100. Higher means more running for the same effort. The dots show Garmin\u2019s VO2 max estimate.',
+  lg_bidx:'Form index (left axis)', lg_bvo2:'VO2 max (right axis)',
+  v_up:'Getting stronger', v_flat:'Holding steady', v_down:'Tough period', v_wait:'Too early to tell',
+  why:(n,a,b,d)=>`The last ${n} runs average ${a} on the index, against ${b} for the ${n} before (${d}).`,
+  why_wait:'Needs at least four runs before it can say anything.',
+  tip_b:(l,i,km,p,v)=>`${l}\nForm index ${i}\n${km} km run at avg HR ${p}`+(v?`\nVO2 max ${v}`:''),
   t_dist:'Distance in the intervals', t_dist_sub:'Kilometres covered while running and walking in the interval part of each run, measured by the watch. The dot shows the whole run including warm-up and cool-down.',
   lg_drun:'Running', lg_dwalk:'Walking', lg_dtot:'Whole run', tip_dist:(l,a,b,c,t,est)=>`${l}\nRunning ${a} km\nWalking ${b} km\nIntervals total ${c} km`+(t?`\nWhole run ${t} km`:'')+(est?'\n(estimated from pace)':''),
   feels:['Under the weather','Heavy','Sluggish','OK','Good','Strong','Flying!'], d_feel:'Feel', d_body:'Body', d_note:'Diary',
@@ -745,6 +764,12 @@ const T = {
   n_powt:'Løpekraft',n_powt_sub:'Snitt og høyeste watt i løpebitene, økt for økt.',
   n_respt:'Respirasjonsfrekvens',n_respt_sub:'Snitt åndedrag per minutt under løping og gåing, og høyeste verdi i økta.',
   rec_watt:'høyeste watt i en løpebit', g_wmax:'Maks W', u_br:'pust/min',
+  b_title:'Formbarometer', b_sub:'Hvor mye jeg løper sammenlignet med hvor hardt hjertet må jobbe: kilometer løpt i intervallene delt på snittpuls, der første økt i programmet er satt til 100. Høyere betyr mer løping for samme innsats. Prikkene viser Garmins VO2maks-estimat.',
+  lg_bidx:'Formindeks (venstre akse)', lg_bvo2:'VO2maks (høyre akse)',
+  v_up:'Blir sterkere', v_flat:'Holder nivået', v_down:'Tøff periode', v_wait:'For tidlig å si',
+  why:(n,a,b,d)=>`De ${n} siste øktene har snitt ${a} på indeksen, mot ${b} for de ${n} før (${d}).`,
+  why_wait:'Trenger minst fire økter før den kan si noe.',
+  tip_b:(l,i,km,p,v)=>`${l}\nFormindeks ${i}\n${km} km løpt med snittpuls ${p}`+(v?`\nVO2maks ${v}`:''),
   t_dist:'Distanse i intervallene', t_dist_sub:'Kilometer løpt og gått i intervalldelen av hver økt, målt av klokka. Prikken viser hele økta med oppvarming og nedjogging.',
   lg_drun:'Løping', lg_dwalk:'Gåing', lg_dtot:'Hele økta', tip_dist:(l,a,b,c,t,est)=>`${l}\nLøping ${a} km\nGåing ${b} km\nIntervaller totalt ${c} km`+(t?`\nHele økta ${t} km`:'')+(est?'\n(beregnet fra tempo)':''),
   feels:['Småsyk','Tung','Seig','Grei','Bra','Sterk','Flyr!'], d_feel:'Dagsform', d_body:'Kroppen', d_note:'Dagbok',
@@ -965,6 +990,44 @@ function multiTrend(hostId,series,lo,hi,fmt,unit){
     pts.forEach(p=>{const c=el('circle',{cx:x(p[0]),cy:y(p[1]),r:4.5,fill:sr.color},s);bindTip(c,`${labelOf(rows[p[0]])}\n${sr.name()}: ${fmt(p[1])} ${unit}`)});
   });
   rows.forEach((o,i)=>txt(s,{x:x(i),y:H-8,'text-anchor':i===0?'start':i===n-1?'end':'middle'},o.uke===0?L().start:L().short(o.uke,o.okt)));
+}
+
+/* ---------- Formbarometer ---------- */
+function drawBarometer(){
+  const rows=prog.filter(o=>o.km_lop&&o.puls); if(!rows.length) return;
+  const base=rows[0].km_lop/rows[0].puls, idx=rows.map(o=>Math.round(o.km_lop/o.puls/base*100));
+  // Dom: snitt av de siste n mot de n før (n=3, eller færre tidlig i programmet)
+  const v=$('b-verdict'), why=$('b-why'), n=Math.min(3,Math.floor(rows.length/2));
+  const arrow=d=>`<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="${d}"/></svg>`;
+  if(n<2){v.className='verdict flat';v.textContent=L().v_wait;why.textContent=L().why_wait;}
+  else{
+    const avg=a=>a.reduce((x,y)=>x+y,0)/a.length, a=avg(idx.slice(-n)), b=avg(idx.slice(-2*n,-n)), ch=(a-b)/b*100;
+    const k=ch>5?'up':ch<-5?'down':'flat';
+    v.className='verdict '+k;
+    v.innerHTML=arrow(k==='up'?'M12 4l7 8h-4v8H9v-8H5z':k==='down'?'M12 20l-7-8h4V4h6v8h4z':'M4 12l8-7v4h8v6h-8v4z');
+    v.append(L()['v_'+k]);
+    why.textContent=L().why(n,Math.round(a),Math.round(b),(ch>0?'+':'')+nf(ch,0)+' %');
+  }
+  const H=230,[s,W]=svgBox($('c-baro'),H); const m={l:40,r:44,t:14,b:30},iw=W-m.l-m.r,ih=H-m.t-m.b, N=rows.length;
+  const top=Math.max(150,Math.ceil(Math.max(...idx)/50)*50), ticks=[]; for(let t=0;t<=top;t+=50) ticks.push(t);
+  const y=t=>m.t+ih-t/top*ih, x=i=>m.l+(N===1?iw/2:i*iw/(N-1));
+  gridY(s,ticks,y,m,W,t=>String(t));
+  el('line',{x1:m.l,x2:W-m.r,y1:y(100),y2:y(100),stroke:css('--muted'),'stroke-dasharray':'3 4'},s);
+  const line=idx.map((v,i)=>`${x(i)},${y(v)}`).join(' L');
+  el('path',{d:`M${x(0)},${y(0)} L${line} L${x(N-1)},${y(0)} Z`,fill:css('--pink-soft')},s);
+  el('path',{d:'M'+line,fill:'none',stroke:css('--pink'),'stroke-width':2.5,'stroke-linejoin':'round'},s);
+  // VO2maks på høyre akse
+  const vo=rows.map(o=>o.nerd&&o.nerd.vo2max), vv=vo.filter(Boolean);
+  let yv=null;
+  if(vv.length){ const lo=Math.floor(Math.min(...vv))-1, hi=Math.ceil(Math.max(...vv))+1; yv=v=>m.t+ih-(v-lo)/(hi-lo)*ih;
+    [lo,Math.round((lo+hi)/2),hi].forEach(t=>txt(s,{x:W-m.r+6,y:yv(t)+4,'text-anchor':'start'},String(t))); }
+  rows.forEach((o,i)=>{
+    const t=L().tip_b(labelOf(o),idx[i],nf(o.km_lop,2),Math.round(o.puls),vo[i]?nf(vo[i],1):null);
+    if(vo[i]&&yv){const c=el('circle',{cx:x(i),cy:yv(vo[i]),r:3.5,fill:css('--volt')},s);bindTip(c,t);}
+    const c=el('circle',{cx:x(i),cy:y(idx[i]),r:i===N-1?6:4.5,fill:css('--pink')},s); bindTip(c,t);
+    if(W>=560) txt(s,{x:x(i),y:H-8,'text-anchor':i===0?'start':i===N-1?'end':'middle'},L().short(o.uke,o.okt));
+    else if(o.okt===1) txt(s,{x:x(i),y:H-8,'text-anchor':i===0?'start':'middle'},(lang==='no'?'U':'W')+o.uke);
+  });
 }
 
 /* ---------- Kalender og styrke ---------- */
@@ -1244,6 +1307,7 @@ function drawAll(){
   drawPlan(); drawSession();
   trend('c-trend-puls','puls',L().u_bpm,140,165,css('--pink'),v=>Math.round(v));
   trend('c-trend-fall','pulsfall',L().u_beats,20,32,css('--volt'),v=>nf(v,1));
+  drawBarometer();
   { const host=$('c-trend-dist'), rows=okter, H=220,[sv,W]=svgBox(host,H);
     const m={l:36,r:10,t:16,b:30},iw=W-m.l-m.r,ih=H-m.t-m.b, n=rows.length, bw=iw/n;
     const top=Math.max(4,...rows.map(o=>Math.max(o.km,(o.nerd&&o.nerd.km_total)||0)));
